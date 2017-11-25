@@ -5,6 +5,13 @@
 \usepackage{amsmath}
 \usepackage{SIunits}
 \usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{graphics}
+\usepackage{subfigure}
+\usepackage{floatflt}
+
+
 
  %\title{High enthalpy effects on hypersonic boundary-layer transition}
  \title{Code to code comparison on hypersonic high enthalpy transitional boundary layers}
@@ -12,9 +19,9 @@
 
 \author{
   Viola Wartemann%
-   \thanks{Research Scientist, Spacecraft Department, DLR Braunschweig, Viola.Wartemann@dlr.de}\\
+  \thanks{Research Scientist, Spacecraft Department, DLR Braunschweig, Viola.Wartemann@dlr.de}, Alexander Wagner\thanks{Research Scientist, Spacecraft Department, DLR G\"ottingen, Alexander.Wagner@dlr.de}\\
   {\normalsize\itshape
-  German Aerospace Center (DLR), Institute of Aerodynamics and Flow Technology, Braunschweig, Germany} \\
+  German Aerospace Center (DLR), Institute of Aerodynamics and Flow Technology, Spacecraft Department, Germany} \\
   \and
   Ross Wagnild%
     \thanks{Research Scientist, Sandia National Laboratories, Albuquerque, USA, rmwagni@sandia.gov} \\
@@ -22,12 +29,7 @@
   Sandia National Laboratories, Albuquerque, USA} \\
   \and
   Fabio Pinna%
-    \thanks{Research Scientist, von Karman Institute for Fluid Dynamics, Rhode-St-Genèse, Belgium, fabio.pinna@vki.ac.be} \\
-{\normalsize\itshape
-  von Karman Institute for Fluid Dynamics, Aeronautics and Aerospace Department, Rhode-St-Genèse, Belgium} \\
-    \and
-  Fernando Miro%
-    \thanks{PhD Student, von Karman Institute for Fluid Dynamics, Rhode-St-Genèse, Belgium, fernando.miro.miro@vki.ac.be} \\
+    \thanks{Research Scientist, von Karman Institute for Fluid Dynamics, Rhode-St-Genèse, Belgium, fabio.pinna@vki.ac.be}, Fernando Miro\thanks{PhD Student, von Karman Institute for Fluid Dynamics, Rhode-St-Genèse, Belgium, fernando.miro.miro@vki.ac.be} \\   
 {\normalsize\itshape
   von Karman Institute for Fluid Dynamics, Aeronautics and Aerospace Department, Rhode-St-Genèse, Belgium} \\
   \and
@@ -35,10 +37,6 @@
     \thanks{Research Scientist, Japan Aerospace Exploration Agency, Kimigaya, Japan, tanno@spaceships.isas.jaxa.jp} \\
 {\normalsize\itshape
  Japan Aerospace Exploration Agency, Kimigaya, Japan} \\
-  Alexander Wagner% 
-   \thanks{Research Scientist, Spacecraft Department, DLR G\"ottingen, Alexander.Wagner@dlr.de} \\
-  {\normalsize\itshape
-  German Aerospace Center (DLR), Institute of Aerodynamics and Flow Technology, G\"ottingen, Germany} \\
 }
 
  % Data used by 'handcarry' option if invoked
@@ -88,27 +86,6 @@ Laminar to turbulent transition in high-speed boundary-layers is of high importa
 
 Further the stability results are compared against low and high enthalpy experiments, which were performed on a blunted $7^\circ$ half-angle cone model. Two of the chosen experiments for the comparison were performed in the DLR High Enthalpy Shock Tunnel G\"ottingen (HEG) and one additional experiment was performed in the JAXA High Enthalpy Shock Tunnel (HIEST).
 
-
-\section{Numeric methods}
-The equations of the stability codes are derived from the conservation equations of mass, momentum and energy, which govern the flow of a viscous, compressible gas. All flow and material quantities are decomposed into a steady laminar base flow $\bar{q}$ and an unsteady 
-disturbance flow $\tilde{q}$\
-\begin{equation}
-q(x,y,z,t)=\bar{q}(x,y)+\tilde{q}(x,y,z,t).
-\end{equation}
-The  laminar base-flow $\bar{q}$ are calculated by different CFD codes, which solves the Navier-Stokes equations, and can be used without and with chemistry. The disturbance $\tilde{q}$ is represented as a harmonic wave
-\begin{equation}
-\tilde{q}(x,y,z,t)=\hat{q}(x,y)\exp[i(\alpha x + \beta z - \omega t)]\label{wave}
-\end{equation}
-with the complex-valued amplitude function $\hat{q}$. \\
-
-All codes can be used for Linear Stability Theory (LST) as well as Parabolized Stability Equations (PSE) analyses. In contrast to STABL and VESTA, which can exclude or include chemistry, NOLOT is limited on the perfect gas assumption.  
-
-\subsection{STABL}
-\textcolor{blue}{It make sense to describe one code in more detail and not all codes. The STABL code is the code with the most options (especially, the chemistry option), thus I would suggest to describe the STABL code in more detail. Please, add a description of your stability code.}
-\subsection{VESTA}
-\textcolor{green}{Please, add a short description of your stability code.}
-\subsection{NOLOT}
-
 \section{Wind tunnels and wind tunnel model}\label{sect:model}
 For both wind tunnels a similar, not the same, cone model is used: a $7^\circ$ half-angle blunted cone with an overall length of about $1 \hspace{0.05cm} \rm m$ and an nose tip radius of $2.5\hspace{0.05cm} \rm mm$ (see picture \ref{fig:cone_model}). Both models were equipped with thermocouples and pressure transducers. The models were supported by a sting system at nominal $0^\circ$ angle of attack.\\
 
@@ -142,10 +119,75 @@ HIEST-High-E&   &   &      & &  & & & \\
 
 \textcolor{red}{Thanks Tanno for your data. Alex selected one test case, which is in a comparable range to the HEG high enthalpy case. I will send the free stream condition in an additional email.}
 
+\section{Numeric methods}
+\subsection{Base-flow solver}
+The laminar base-flows $\bar{q}$, which are required for the stability codes, are calculated by different CFD solvers, which are not described in detail here. For example, one used code is the DLR TAU code. The TAU code is a three-dimensional parallel hybrid multi-grid code and has been validated for hypersonic flows (see e.g. Mack et al.\cite{Mack_2002}). All base-flow calculations of the different codes based on constant free stream condition, which are listed in table consider real gas effects, based on thermochemical non-equilibrium gas modeling with 5 species for air: $N_2$, $O_2$, $NO$, $N$, $O$. Constant free stream conditions, which are listed in table \ref{tab:test_cases}, are used. Deviations from these agreements,  are explicitly mentioned in the text. As one example of the base-flow calculation figure bla shows the low-enthalpy test case (see also table \ref{tab:test_cases}: HEG-Low-E). 
+
+\begin{figure}[htbp]
+	\centering
+\includegraphics[width=0.8\textwidth]{pics/heg_low_e_base_flow.jpg}
+	\caption{Example of base-flow (HEG-Low-E. test case)}
+	\label{fig:cone_model}
+\end{figure}
+
+Please mentioned, that also different grids for the base-flow calculations are used (adapted and non-adapted grids, which has an influence of the necessary point number; see also section \ref{sect:grid}:grid convergence).
+
+\subsection{LST/PSE solver}
+The equations of the stability codes are derived from the conservation equations of mass, momentum and energy, which govern the flow of a viscous, compressible gas. All flow and material quantities are decomposed into a steady laminar base flow $\bar{q}$ and an unsteady 
+disturbance flow $\tilde{q}$\
+\begin{equation}
+q(x,y,z,t)=\bar{q}(x,y)+\tilde{q}(x,y,z,t).
+\end{equation}
+The  laminar base-flow $\bar{q}$ are calculated by different CFD codes, which solves the Navier-Stokes equations, and can be used without and with chemistry. The disturbance $\tilde{q}$ is represented as a harmonic wave
+\begin{equation}
+\tilde{q}(x,y,z,t)=\hat{q}(x,y)\exp[i(\alpha x + \beta z - \omega t)]\label{wave}
+\end{equation}
+with the complex-valued amplitude function $\hat{q}$. \\
+
+All codes can be used for Linear Stability Theory (LST) as well as Parabolized Stability Equations (PSE) analyses. In contrast to STABL and VESTA, which can exclude or include chemistry, NOLOT is limited on the perfect gas assumption.  
+
+\subsection{STABL}
+\textcolor{blue}{It make sense to describe one code in more detail and not all codes. The STABL code is the code with the most options (especially, the chemistry option), thus I would suggest to describe the STABL code in more detail. Please, add a description of your stability code.}
+\subsection{VESTA}
+\textcolor{green}{The code is made of different components dealing with the different aspects of the stability equations solution: derivation of a generic set of equations, generation of an automated implementation and a set of solution algorithms associated to different ansatz.\\
+In order to perform the different tasks the VESTA toolkit is coded in MAXIMA, MATLAB\textsuperscript{\textregistered} and fortran. 
+The toolkit has been tested against several cases available in the literature such as the one in Malik \cite{Malik:1990}, Arnal \cite{Arnal:agard1994} and \"{O}zgen and K{\i}rcal{\i}\cite{Ozgen_Kircali:2008}.\\
+Several solvers are available within VESTA, namely LST, PSE and BiGlobal. They are all able to cope with different regimes from incompressible to compressible flows with LST and PSE dealing with chemical reactions. The numerical method currently in use is based on a Chebyshev collocation method similar to the one described by Malik\cite{Malik:1990}. A set of Gauss-Chebyshev-Lobatto points has been chosen
+\begin{equation}
+x_j=\cos\left( \frac{j \pi}{N}\right).
+\end{equation}
+Given a function $v$ defined on the aforementioned points,  it is possible to obtain its derivative by defining a polynomial $p$ that satisfy the usual condition for an interpolation problem $p(x_j)= v_j$ for $j=0,\ldots,N$ and then computing its derivative $w_j = p'(x_j)$.This is a linear operation and it could be represented as a simple multiplication by an $(N+1)\times(N+1)$ matrix $w = D_N	\cdot v$. Note that $m$-th order derivative could be easily computed by $\left(D_N\right)^m$.\\
+The algebraic mapping proposed by Malik \cite{Malik:1990} has been used to transform Chebyshev polynomials defined in $x=[-1,1]$ to the physical domain $y=[0, \infty)$ (truncated arbitrarily in $y=[0, y_{max}]$)
+\begin{equation}
+ y = a \frac{1 + x}{b - x};
+\end{equation}
+where $b= 1 +2a/y_{max}$ and $a=y_i y_{max}/(y_{max}-2y_i)$ with $y_i$ corresponding to the location $x=0$.\\
+For the current set of calculations four homogeneous boundary conditions are applied to $\tilde{u}$, $\tilde{v}$, $\tilde{w}$, $\tilde{T}$. These homogeneous Dirichlet b.c. can be easily plugged into the collocation method by skipping the first and the last rows and columns [$D_N$ becomes a $(N-1)\times(N-1)$ matrix]. Two zeros at the extremities of the resulting $w$ could be appended so that the final vector has the correct dimension.\\
+In case of a Neumann boundary conditions the problem could be stated by extracting the corresponding row from the matrix $D_1$.
+As nothing is prescribed on pressure, one could either use a staggered grid as in Khorrami \emph{at al.}\cite{Khorrami_Malik_Ash:1989} or introduce a compatibility condition on pressure. This could be achieved by re-writing the y-momentum equation at the boundaries and adding them to the system as new equations to be solved:
+\begin{equation}
+\left.\frac{\partial \hat{p}}{\partial y} \right|_{y=0,y_{max}}= X_{0,m}.
+\end{equation}
+The variable vector gains two more variables, namely $\tilde{p}_0$ and $\tilde{p}_N$, and two new equations are introduced by appending two rows and two columns to the matrices reaching a final dimension of $\left( 5N -3 \right)$.
+}
+
+\subsection{NOLOT}
+
+
 \section{Results}\label{sect:results}
 
 \subsection{Low enthalpy test case (HEG)}\label{sect:low_enthalpy}
+\subsubsection{Grid convergence}\label{sect:grid}
+\begin{figure}[htbp]
+	\centering
+\includegraphics[width=0.6\textwidth]{pics/N_comparison_grid.jpg}
+	\caption{$N$-factor as function of $x$-position - Grind convergence (VESTA)}
+	\label{fig:N_x_grids}
+\end{figure}
 
+- gird points?
+- what else? y+? 
+\subsubsection{Data extraction from the sensor position}
 \subsubsection{LST comparison (VESTA / NOLOT)}
 \subsubsection{PSE comparison (STABL / NOLOT)}
 \subsubsection{Comparison with the HEG experiment}
@@ -189,6 +231,9 @@ Hein, S., Bertolotti, F. P.,  Simen, M., Hanifi, A., Henningson, D., ``Linear no
 \bibitem {Mack_1984}
 Mack, L. M., ``Boundary layer linear stability theory'', \textit{AGARD Special course on stability and transition of laminar flow},  1984
 
+\bibitem {Mack_2002}
+Mack, A., Hannemann, V., ``Validation of the unstructured DLR-TAU-Code for Hypersonic Flows'', \textit{AIAA 2002-3111}, 2002
+
 \bibitem {Malik_1989}
 Malik, M. R.: ``Prediction and control of transition in supersonic and hypersonic boundary layers'', \textit{AIAA Journal}, Vol. 27, No. 11, pp. 1487-1493, 1989
 
@@ -201,6 +246,15 @@ Schneider, S., ``Hypersonic Laminar-Turbulent Transition on Circular Cones and S
 \bibitem {Stetson_1984}
 Stetson, K. F., Thompson, E. R., Donaldson, J. C., Siler, L. G., ``Laminar boundary-layer stability experiments on a cone at Mach 8, Part 2: Blunt cone'', \textit{AIAA Paper}, AIAA84-0006, 198
 
+\bibitem {Ozgen_Kircali:2008}
+  \"{O}zgen, S.,  K{\i}rcal{\i}, S., ``Linear stability analysis in compressible, flat-plate boundary-layers'', \textit{Theoretical and Computational Fluid Dynamics}, Vol. 22, 2008, pp.1--20
+  
+\bibitem {Arnal:agard1994} 
+Arnal, D., ``Boundary Layer Transition'',   \textit{Special course on Progress in Transition Modelling}, R-793, AGARD, 1994
+
+\bibitem {Malik:1990}
+  Malik, M. R., ``Numerical methods for hypersonic boundary layer stability'',
+ \textit{Journal of Computational Physics}, Vol. 86, No. 2, 1990, pp.376--413
 
 \end{thebibliography}
 
